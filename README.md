@@ -13,13 +13,24 @@ To use this crate in your project, add it as a dependency in your `Cargo.toml` f
 
 ```env
 [dependencies]
-logger-rust = "0.1.2"
-````
+logger-rust = "0.1.35"
+```
 Then, import the crate:
 ```rust
-#[macro_use]
-extern crate logger_rust;
-use logger_rust::{set_log_level, LogLevel};
+use logger_rust::*;
+```
+If you want to use them separately:
+```rust
+// all possible crates
+use logger_rust::log_debug;
+use logger_rust::log_info;
+use logger_rust::log_warn;
+use logger_rust::log_error;
+use logger_rust::set_log_path;
+use logger_rust::set_log_level;
+use logger_rust::LOG_PATH;
+use logger_rust::LogLevel;
+use logger_rust::current_time;
 ```
 You can now use the `log_error!`, `log_warn!`, `log_info!`, and `log_debug!` macros to log messages of different types:
 ```rust
@@ -43,10 +54,16 @@ fn main() {
 
 The `set_log_level` function takes a LogLevel as an argument. You can pass one of the following variants to specify where log messages should be written:
 
-- LogLevel::Console: Log messages are printed to the console only.
-- LogLevel::File: Log messages are written to a file only.
-- LogLevel::Both: Log messages are printed to the console and written to a file.
+- `LogLevel::Console`: Log messages are printed to the console only.
+- `LogLevel::File`: Log messages are written to a file only.
+- `LogLevel::Both`: Log messages are printed to the console and written to a file.
 > When logging messages to a file, the crate will automatically create a new file with a name based on the current date (e.g. 2023-06-04.log) or append to an existing file with the same name. If an error occurs while writing to the file (e.g. if the file is not accessible), an error message will be printed to the console.
+
+Also, you can set custom log path. The default path is the same as the path where is your `Cargo.toml` file located.
+The `set_log_path` function takes a `string` as an argument. You can pass one of the following variants to specify where log messages should be written:
+
+- set_log_path("/path/to/dir"): Will create a log file on directory that you specified.
+> Note that if you use "." as dir (which is really not necessary lol), you will get an error message because directory is already busy.
 
 ## Examples
 Here’s an example that shows how to use this crate in a Rust project:
@@ -57,12 +74,32 @@ use log_crate::{set_log_level, LogLevel};
 
 fn main() {
     set_log_level(LogLevel::Both);
+    log_error!("An error occurred: {}", "Something went wrong");
+    log_warn!("A warning occurred: {}", "Something might be wrong");
+    log_info!("An info message: {}", "Something happened");
+    log_debug!("A debug message: {}", "Something happened in detail");
+}
+```
+Also if you want, you can add `set_log_path(string)` method:
+```rust
+extern crate logger_rust;
+use log_crate::{set_log_level, LogLevel};
+
+fn main() {
+    set_log_level(LogLevel::Both);
+    set_log_path("C:/Users/JK/Desktop"); // will output logs on desktop
 
     log_error!("An error occurred: {}", "Something went wrong");
     log_warn!("A warning occurred: {}", "Something might be wrong");
     log_info!("An info message: {}", "Something happened");
     log_debug!("A debug message: {}", "Something happened in detail");
 }
+```
+Also you can use this:
+```rust
+    error(&current_time(), "An error message");
+    warn(&current_time(), "A warning message");
+    info(&current_time(), "An info message");
 ```
 Output:
 ```diff
@@ -74,4 +111,38 @@ An info message: Something happened
 + 2023-06-05 12:23:25 [DEBUG] A debug message: Something happened in detail
 A debug message: Something happened in detail
 ```
-This code sets the log level to LogLevel::Both, which means that log messages will be printed to the console and written to a file. It then uses the logging macros to log messages of different types.
+
+# Custom logging
+After 0.1.2 version, you can create a custom logging function with macros.
+1. Create a `class` named as function that you needed (e.g. `trace`):
+```rust
+pub fn trace(now: &str, message: &str) {
+    log_message("TRACE", now, message);
+}
+```
+Note that log_message functions requires 3 arguments: `now`, `message`, but you can use whatever you want.
+2. Create a macros for method which you created:
+```rust
+#[macro_export]
+macro_rules! log_trace {
+    ($($arg:tt)*) => {{
+        let now = $crate::current_time(); // create a timestamp
+        $crate::trace(&now, &format!($($arg)*)); // output the timestamp with message
+    }}
+}
+```
+Note that `arg` requires 2 arguments.
+3. Use it:
+```rust
+fn main() {
+    set_log_level(LogLevel::Both);
+    log_trace!("A trace log macros");
+}
+```
+Since you have `fn trace`, you can also use this:
+```rust
+    trace(&current_time(), "A trace log");
+```
+It does the same, but you can provide a value instead of `&current_time()`. But it requires 2 arguments:
+1. An `&str` *`now` in our contex*
+2. A `string` value that contains message.
