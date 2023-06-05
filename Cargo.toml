@@ -9,7 +9,7 @@ repository = "https://github.com/jknoptrix/logger-macros"
 license = "MIT OR Apache-2.0"
 license-file = "LICENSE"
 keywords = ["logger", "macros"]
-categories = ["development-tools::debugging"];
+categories = ["development-tools::debugging"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
