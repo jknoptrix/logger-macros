@@ -38,10 +38,3 @@ macro_rules! log_info {
         info($now, &format!($($arg)*)); // call info function with formatted arguments
     }}
 }
-
-fn main() {
-    let now = chrono::Utc::now().to_string();
-    log_error!(&now, "");
-    log_warn!(&now, "");
-    log_info!(&now, "");
-}
