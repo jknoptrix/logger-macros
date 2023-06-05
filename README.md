@@ -1,28 +1,77 @@
-# Logging Macros
-Project have logging macros for different log levels: `error`, `warn`, and `info`. These macros allow you to easily log messages with the current time and appropriate formatting for each log level.
+# Log Crate
+This crate provides a simple and flexible logging system for Rust projects. It allows you to log messages of different types (error, warn, info, debug) using macros and choose whether to log messages to the console, a file, or both.
+
+# Features
+- Log messages of different types (error, warn, info, debug) using macros
+- Choose whether to log messages to the console, a file, or both
+- Set the log level at runtime
+- Automatically create and append to log files based on the current date
+- Handle errors when writing to log files
 
 ## Usage
-To use these macros, you need to declare the variable `now` using `let now = current_time();`. This is necessary because the macros require a reference to the current time to properly format the log messages.
+To use this crate in your project, add it as a dependency in your `Cargo.toml` file:
 
-You also need to add the following crate imports: `use crate::log::{<log type>}; use crate::{<method>};`. These imports are necessary to use the logging functions and the `current_time` function.
-
-To log a message, use the appropriate macro for the desired log level. For example, to log an error message, use the `log_error!` macro like this: `log_error!(&now, "<message>");`. Note that you must pass a reference to `now` as the first argument to the macro.
-
-### Example:
+```env
+[dependencies]
+log_crate = "0.1.0"
+````
+Then, import the crate:
 ```rust
-use logger_rust::{info, log_info};
-
+#[macro_use]
+extern crate logger_rust;
+use logger_rust::{set_log_level, LogLevel};
+```
+You can now use the `log_error!`, `log_warn!`, `log_info!`, and `log_debug!` macros to log messages of different types:
+```rust
 fn main() {
-    let now = current_time();
-    log_info!(&now, "This is an informational message");
+    log_error!("An error occurred: {}", "Something went wrong");
+    log_warn!("A warning occurred: {}", "Something might be wrong");
+    log_info!("An info message: {}", "Something happened");
+    log_debug!("A debug message: {}", "Something happened in detail");
 }
 ```
-> The `log_info!` macro is defined using the macro_rules! macro. It takes two arguments: a reference to the current time `($now:expr)` and a format string with any additional arguments `($($arg:tt)*)`. The macro expands to a call to the info function with the current time and the formatted message as arguments.
+By default, log messages are printed to the console. You can use the `set_log_level` function to specify where log messages should be written:
+```rust
+use log_crate::{set_log_level, LogLevel};
 
-The info function takes two arguments: 
-- A reference to the current time `(now: &str)`;
-- The message to log `(message: &str)`. 
-It uses the colored crate to format the log message with appropriate colors and styles for an informational message. The formatted message is then printed to standard output using the println! macro.
+fn main() {
+    set_log_level(LogLevel::Both);
 
-## Time Module
-The `current_time` function is defined in a separate module because it uses the `chrono` crate to get the current time. This function cannot be defined in the same module as the macros because Rust.
+    // ...
+}
+```
+
+The `set_log_level` function takes a LogLevel as an argument. You can pass one of the following variants to specify where log messages should be written:
+
+- LogLevel::Console: Log messages are printed to the console only.
+- LogLevel::File: Log messages are written to a file only.
+- LogLevel::Both: Log messages are printed to the console and written to a file.
+> When logging messages to a file, the crate will automatically create a new file with a name based on the current date (e.g. 2023-06-04.log) or append to an existing file with the same name. If an error occurs while writing to the file (e.g. if the file is not accessible), an error message will be printed to the console.
+
+## Examples
+Here’s an example that shows how to use this crate in a Rust project:
+```rust
+#[macro_use]
+extern crate logger_rust;
+use log_crate::{set_log_level, LogLevel};
+
+fn main() {
+    set_log_level(LogLevel::Both);
+
+    log_error!("An error occurred: {}", "Something went wrong");
+    log_warn!("A warning occurred: {}", "Something might be wrong");
+    log_info!("An info message: {}", "Something happened");
+    log_debug!("A debug message: {}", "Something happened in detail");
+}
+```
+Output:
+```diff
+- 2023-06-05 12:23:25 [ERROR] An error occurred: Something went wrong
+- 2023-06-05 12:23:25 [WARN] A warning occurred: Something might be wrong
+A warning occurred: Something might be wrong
++ 2023-06-05 12:23:25 [INFO] An info message: Something happened
+An info message: Something happened
++ 2023-06-05 12:23:25 [DEBUG] A debug message: Something happened in detail
+A debug message: Something happened in detail
+```
+This code sets the log level to LogLevel::Both, which means that log messages will be printed to the console and written to a file. It then uses the logging macros to log messages of different types.
