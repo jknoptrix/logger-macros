@@ -1,4 +1,5 @@
 use colored::Colorize;
+use chrono::Local;
 
 pub fn error(now: &str, message: &str) {
     // define error function for printing error messages
@@ -15,26 +16,34 @@ pub fn info(now: &str, message: &str) {
     println!("{} {} {}", now.bold().dimmed(), "[INFO]".bold().cyan(), message.cyan()); // print formatted info message to stdout
 }
 
+pub fn current_time() -> String {
+    Local::now().format("%Y-%m-%d %H:%M:%S").to_string()
+}
+
 #[macro_export]
 macro_rules! log_error {
     // define log_error macro for logging error messages
-    ($now:expr, $($arg:tt)*) => {{
-        error($now, &format!($($arg)*)); // call error function with formatted arguments
+    ($($arg:tt)*) => {{
+        let now = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+        error(&now, &format!($($arg)*)); // call error function with formatted arguments
     }}
 }
 
 #[macro_export]
 macro_rules! log_warn {
     // define log_warn macro for logging warning messages
-    ($now:expr, $($arg:tt)*) => {{
-        warn($now, &format!($($arg)*)); // call warn function with formatted arguments
+    ($($arg:tt)*) => {{
+        let now = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+        warn(&now, &format!($($arg)*)); // call warn function with formatted arguments
     }}
 }
 
 #[macro_export]
 macro_rules! log_info {
     // define log_info macro for logging info messages
-    ($now:expr, $($arg:tt)*) => {{
-        info($now, &format!($($arg)*)); // call info function with formatted arguments
+    ($($arg:tt)*) => {{
+        let now = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+        info(&now, &format!($($arg)*)); // call info function with formatted arguments
     }}
 }
+
