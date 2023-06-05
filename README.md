@@ -1,4 +1,4 @@
-# Log Crate
+# Logger macro
 This crate provides a simple and flexible logging system for Rust projects. It allows you to log messages of different types (error, warn, info, debug) using macros and choose whether to log messages to the console, a file, or both.
 
 # Features
@@ -13,7 +13,7 @@ To use this crate in your project, add it as a dependency in your `Cargo.toml` f
 
 ```env
 [dependencies]
-logger-rust = "0.1.0"
+logger-rust = "0.1.2"
 ````
 Then, import the crate:
 ```rust
