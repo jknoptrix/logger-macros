@@ -8,12 +8,33 @@ use std::{
     time::Duration,
 };
 pub fn set_log_level(level: LogLevel) {
+//! Sets the log level to the provided value.
+//!
+//! # Examples
+//!
+//! ```
+//! use logger_rust::LogLevel;
+//! // Set the log level to INFO
+//! set_log_level(LogLevel::Info);
+//! ```
     let log_variables = LogVariablesImpl;
     let mut log_level = log_variables.log_level().lock().unwrap();
     *log_level = level;
 }
 
 pub fn set_log_path<P: AsRef<Path>>(path: P) {
+//! Sets the path to the log file.
+//!
+//! If the provided path is not valid, an error message will be logged and the
+//! current thread will sleep for 10 seconds before exiting with an error code.
+//!
+//! # Examples
+//!
+//! Set the path to the log file
+//! ```
+//! use logger_rust::set_log_path;
+//! set_log_path("C:/Users/qruie/Desktop");
+//! ```
     let path = path.as_ref();
     match (
         path.exists(),

@@ -10,6 +10,11 @@ lazy_static::lazy_static! {
 
 #[derive(Copy, Clone)]
 pub enum LogLevel {
+/// # LogLevel enum
+/// Defines the logger levels parameters: `Console`, `File`, `Both`
+/// - The `Console` level will output logs only into console buffer
+/// - The `File` level will place logs only into files, including existing logs
+/// - The `Both` level **does the both**.
     Console,
     File,
     Both

@@ -10,6 +10,12 @@ use std::{
 };
 
 pub fn log_to_file(now: &str, message: &str) -> io::Result<()> {
+//! # log_to_file
+//! The `log_to_file` function takes two arguments: `now` and `message`. 
+//! - The `now` argument is a string representing the current time and the message argument is the message to be logged. 
+//! The function checks if the log path is empty. If it is, it creates a new filename using the current date. If the log path is not empty, 
+//! it joins the log path with the filename. 
+//! The function then creates a new file at the specified path using the `OpenOptions` struct and writes the message to the file.
     let log_path = LOG_PATH.lock().unwrap();
     let filename = if log_path.as_os_str().is_empty() {
         format!("{}.log", Local::now().format("%Y-%m-%d"))
@@ -23,6 +29,18 @@ pub fn log_to_file(now: &str, message: &str) -> io::Result<()> {
 }
 
 pub fn log_message(level: &str, now: &str, message: &str) {
+//! # log_message
+//! The log_message function takes three arguments: level, now, and message. 
+//! - The `level` argument is a string representing the log level *(e.g. “ERROR”, “WARN”, “INFO”, “DEBUG”)*. 
+//! - The `now` argument is a string representing the current time and the message argument is the message to be logged. 
+//! - The `function` matches the log level with a color code and formats the message with the color code and log level. 
+//! It then checks the current log level and logs the message to either the console, a file, or both depending on the current log level.
+//! ### Usage
+//! You can use it casually avoiding the macroses and fn():
+//! ```rust
+//! use logger_rust::log_message;
+//! log_message("TRACE", now, message);
+//! ```
     let color_code = match level {
         "ERROR" => "\x1b[31m", // red
         "WARN" => "\x1b[33m",  // yellow
