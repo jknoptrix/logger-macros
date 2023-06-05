@@ -6,7 +6,6 @@ authors = ["Albert Munchhausen", "jknoptrix <support@classicpvp.ru>"]
 description = "A crate for logger with 4 loggin types and 3 types of level logging"
 readme = "README.md"
 repository = "https://github.com/jknoptrix/logger-macros"
-license = "MIT OR Apache-2.0"
 license-file = "LICENSE"
 keywords = ["logger", "macros"]
 categories = ["development-tools::debugging"]
