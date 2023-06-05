@@ -10,9 +10,7 @@ To log a message, use the appropriate macro for the desired log level. For examp
 
 ### Example:
 ```rust
-use crate::log_info; // macro imports
-use crate::log::info; // method imports
-use crate::time::current_time; // time import
+use logger_rust::{info, log_info};
 
 fn main() {
     let now = current_time();
