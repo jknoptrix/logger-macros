@@ -13,7 +13,7 @@
 //!
 //! ```env
 //! [dependencies]
-//! logger-rust = "0.1.44"
+//! logger-rust = "0.1.45"
 //! ```
 //! Then, import the crate:
 //! ```rust

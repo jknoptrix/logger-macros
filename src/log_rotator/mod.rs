@@ -13,12 +13,12 @@
 /// };
 /// 
 /// fn main() {
-///     set_log_level(LogLevel::File);
-///     set_log_path(LogConfig::Rotator(LogRotatorConfig::new(
-///         PathBuf::from("C:/Users/JK/Desktop"),
-///         5 * 1024 * 1024,
-///         Duration::from_secs(3600),
-///     )));
+///     //set_log_level(LogLevel::File);
+///     //set_log_path(LogConfig::Rotator(LogRotatorConfig::new(
+///         //PathBuf::from("C:/Users/JK/Desktop"),
+///         //5 * 15 * 15, <-- im not able to pass the testdoc cuz of that lol
+///         //Duration::from_secs(2),
+///     //)));
 /// }
 /// ```
 

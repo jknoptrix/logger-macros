@@ -23,9 +23,9 @@ pub fn log_to_file(now: &str, message: &str) -> io::Result<()> {
     let log_path = LOG_PATH.lock().unwrap();
     
     let filename = if log_path.as_os_str().is_empty() {
-        format!("{}.log", Local::now().format("%Y-%m-%d"))
+        format!("{}.log", Local::now().format("%Y-%m-%d@%H-%M-%S"))
     } else {
-        log_path.join(format!("{}.log", Local::now().format("%Y-%m-%d"))).to_string_lossy().into_owned()
+        log_path.join(format!("{}.log", Local::now().format("%Y-%m-%d@%H-%M-%S"))).to_string_lossy().into_owned()
     };
     
     let path = Path::new(&filename);
