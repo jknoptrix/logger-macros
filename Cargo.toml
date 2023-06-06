@@ -1,6 +1,6 @@
 [package]
 name = "logger-rust"
-version = "0.1.41"
+version = "0.1.42"
 edition = "2021"
 authors = ["Albert Munchhausen", "jknoptrix <support@classicpvp.ru>"]
 description = "A crate for logger with 4 loggin types and 3 types of level logging"

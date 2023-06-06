@@ -13,7 +13,7 @@ To use this crate in your project, add it as a dependency in your `Cargo.toml` f
 
 ```env
 [dependencies]
-logger-rust = "0.1.41"
+logger-rust = "0.1.42"
 ```
 Then, import the crate:
 ```rust
