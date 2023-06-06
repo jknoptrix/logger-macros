@@ -13,7 +13,7 @@
 //!
 //! ```env
 //! [dependencies]
-//! logger-rust = "0.1.43"
+//! logger-rust = "0.1.44"
 //! ```
 //! Then, import the crate:
 //! ```rust
@@ -36,6 +36,8 @@
 //! You can now use the `log_error!`, `log_warn!`, `log_info!`, and `log_debug!` macros to log messages of different types:
 //!
 //! ```rust
+//! use logger_rust::*;
+//! 
 //! fn main() {
 //!     log_error!("An error occurred: {}", "Something went wrong");
 //!     log_warn!("A warning occurred: {}", "Something might be wrong");
@@ -47,6 +49,8 @@
 //!
 //! Also you can use this:
 //! ```rust
+//! use logger_rust::*;
+//! 
 //!     error(&current_time(), "An error message");
 //!     warn(&current_time(), "A warning message");
 //!     info(&current_time(), "An info message");
@@ -68,6 +72,8 @@
 //! 1. Create a `class` named as function that you needed (e.g. `trace`):
 //!
 //! ```rust
+//! use logger_rust::*;
+//! 
 //! pub fn trace(now: &str, message: &str) {
 //!     log_message("TRACE", now, message);
 //! }
