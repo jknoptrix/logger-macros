@@ -13,24 +13,11 @@ To use this crate in your project, add it as a dependency in your `Cargo.toml` f
 
 ```env
 [dependencies]
-logger-rust = "0.1.35"
+logger-rust = "0.1.39"
 ```
 Then, import the crate:
 ```rust
 use logger_rust::*;
-```
-If you want to use them separately:
-```rust
-// all possible crates
-use logger_rust::log_debug;
-use logger_rust::log_info;
-use logger_rust::log_warn;
-use logger_rust::log_error;
-use logger_rust::set_log_path;
-use logger_rust::set_log_level;
-use logger_rust::LOG_PATH;
-use logger_rust::LogLevel;
-use logger_rust::current_time;
 ```
 You can now use the `log_error!`, `log_warn!`, `log_info!`, and `log_debug!` macros to log messages of different types:
 ```rust
@@ -61,11 +48,41 @@ The `set_log_level` function takes a LogLevel as an argument. You can pass one o
 
 Also, you can set custom log path. The default path is the same as the path where is your `Cargo.toml` file located.
 The `set_log_path` function takes a `string` as an argument. You can pass one of the following variants to specify where log messages should be written:
+```rust
+use logger_rust::*;
 
-- set_log_path("/path/to/dir"): Will create a log file on directory that you specified.
+fn main() {
+    set_log_path(LogConfig::Path(LogPath::from("/path/to/log/dir")));
+}
+```
+Will create a log file on directory that you specified.
 > Note that if you use "." as dir (which is really not necessary lol), you will get an error message because directory is already busy.
 
-## Examples
+## Log rotation
+From version 1.0.39, you can create a `log rotator` instance which allows you to split logs by their size and duration.
+- log_path: path to log directory;
+- max_size (`u64`): maximum size of log file;
+- max_life (`std::time::Duration`): maximum lifetime of log file;
+
+Here's an example:
+```rust
+use logger_rust::*; // importing logger
+use std::{
+    path::PathBuf,
+    time::Duration
+};
+
+fn main() {
+    set_log_path(LogConfig::Rotator(LogRotatorConfig::new(
+        PathBuf::from("C:/Users/JK/Desktop"), // path to the log directory
+        5 * 1024 * 1024, // 5 MB
+        Duration::from_secs(3600), // duration
+    )));
+}
+```
+### Note that you **SHOULD NOT** use LogRotator and LogPath in single instance. You will block the log file.
+
+# Examples
 Here’s an example that shows how to use this crate in a Rust project:
 ```rust
 #[macro_use]
@@ -78,16 +95,18 @@ fn main() {
     log_warn!("A warning occurred: {}", "Something might be wrong");
     log_info!("An info message: {}", "Something happened");
     log_debug!("A debug message: {}", "Something happened in detail");
+    // ...
 }
 ```
-Also if you want, you can add `set_log_path(string)` method:
+Also if you want, you can add `set_log_path(LogConfig::Path(LogPath::From("string")` method:
 ```rust
 extern crate logger_rust;
 use log_crate::{set_log_level, LogLevel};
+use logger_rust::*;
 
 fn main() {
     set_log_level(LogLevel::Both);
-    set_log_path("C:/Users/JK/Desktop"); // will output logs on desktop
+    set_log_path(LogConfig::Path(LogPath::from("C:/Users/JK/Desktop"))); // will output logs on desktop
 
     log_error!("An error occurred: {}", "Something went wrong");
     log_warn!("A warning occurred: {}", "Something might be wrong");

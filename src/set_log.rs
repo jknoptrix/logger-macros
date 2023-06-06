@@ -1,8 +1,14 @@
-use crate::config::{LogVariables, LogVariablesImpl, LogLevel};
-use crate::log_error;
-use crate::LOG_PATH;
+pub use crate::config::{LogVariables, LogVariablesImpl, LogLevel, LOG_ROTATOR_CONFIG, LOG_MUTEX};
+pub use crate::{log_error, LOG_PATH};
+pub use crate::log_rotator::{
+    LogPath,
+    LogConfig,
+    LogRotatorConfig,
+
+};
+
 use std::{
-    path::{Path, PathBuf},
+    path::PathBuf,
     process,
     thread,
     time::Duration,
@@ -13,29 +19,64 @@ pub fn set_log_level(level: LogLevel) {
 //! # Examples
 //!
 //! ```
-//! use logger_rust::LogLevel;
-//! // Set the log level to INFO
-//! set_log_level(LogLevel::Info);
+//! use logger_rust::*;
+//! 
+//! fn main() {
+//! // Set the log level to File
+//!   set_log_level(LogLevel::File);
+//! }
 //! ```
+//! 
     let log_variables = LogVariablesImpl;
     let mut log_level = log_variables.log_level().lock().unwrap();
     *log_level = level;
 }
 
-pub fn set_log_path<P: AsRef<Path>>(path: P) {
-//! Sets the path to the log file.
+pub fn set_log_path(config: LogConfig) {
+//! Sets the log path and, optionally, the log rotator configuration.
 //!
-//! If the provided path is not valid, an error message will be logged and the
-//! current thread will sleep for 10 seconds before exiting with an error code.
+//! This function takes a `LogConfig` argument that specifies the log path and, optionally,
+//! the log rotator configuration. If a log rotator configuration is provided, the log rotator
+//! will automatically rotate the logs when necessary based on the provided configuration.
+//!
+//! # Arguments
+//!
+//! * `config` - The log configuration. Can be either a `LogConfig::Path` variant that specifies
+//!   the log path or a `LogConfig::Rotator` variant that specifies the log path and the log
+//!   rotator configuration.
 //!
 //! # Examples
+//! ### Set the log path without a log rotator:
+//! ```
+//! use logger_rust::*;
+//! use std::time::Duration;
+//! use std::path::PathBuf;
 //!
-//! Set the path to the log file
+//! 
+//! set_log_path(LogConfig::Path(LogPath::from("C:/Users/qruie/Documents")));
 //! ```
-//! use logger_rust::set_log_path;
-//! set_log_path("C:/Users/qruie/Desktop");
+//! 
+//! ### Set the log path with a log rotator
 //! ```
-    let path = path.as_ref();
+//! use logger_rust::*;
+//! use std::time::Duration;
+//! use std::path::PathBuf;
+//!
+//! set_log_path(LogConfig::Rotator(LogRotatorConfig::new(
+//!     PathBuf::from("C:/Users/qruie/Documents"),
+//!     5 * 1024 * 1024,
+//!     Duration::from_secs(2),
+//! )));
+//! ```
+    let path = match config {
+        LogConfig::Path(LogPath::Path(path)) => path,
+        LogConfig::Rotator(rotator_config) => {
+            let log_path = rotator_config.log_path.clone();
+            let mut log_rotator_config = LOG_ROTATOR_CONFIG.lock().unwrap();
+            *log_rotator_config = Some(rotator_config);
+            log_path
+        }
+    };
     match (
         path.exists(),
         path.is_dir(),

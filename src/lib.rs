@@ -74,15 +74,17 @@
 //! ```
 //!
 
-mod time;
-mod config;
-mod set_log;
-mod log_file;
+pub mod time;
+pub mod config;
+pub mod set_log;
+pub mod log_file;
+pub mod log_rotator;
+pub use crate::log_rotator::*;
 pub use crate::config::LOG_PATH;
 pub use crate::time::current_time;
 pub use crate::log_file::log_message;
-pub use crate::config::{LogVariables, LogVariablesImpl, LogLevel};
 pub use crate::set_log::{set_log_level, set_log_path};
+pub use crate::config::{LogVariables, LogVariablesImpl, LogLevel};
 
 pub fn error(now: &str, message: &str) {
 //! # Error
