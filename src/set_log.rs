@@ -68,6 +68,15 @@ pub fn set_log_path(config: LogConfig) {
     //!     Duration::from_secs(2),
     //! )));
     //! ```
+    let log_variables = LogVariablesImpl;
+    let log_level = log_variables.log_level().lock().unwrap();
+    if *log_level != LogLevel::File && *log_level != LogLevel::Both {
+        panic!("
+        Cannot call set_log_path when log level is no set to `LogLevel::File` or `LogLevel::Both`
+        Please, specify the `LogLevel::Console` or `LogLevel::Path` if you want to use `set_log_path`
+        `set_log_level(LogLevel::File);` // OR `LogLevel::Both` <──────────────────────────────┘
+        ---------------------------------------\n");
+    }
     let handle = thread::spawn(move || {
         let path = match config {
             LogConfig::Path(LogPath::Path(path)) => path,

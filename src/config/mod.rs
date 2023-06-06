@@ -12,7 +12,7 @@ lazy_static::lazy_static! {
     pub static ref LOG_ROTATOR_CONFIG: Mutex<Option<LogRotatorConfig>> = Mutex::new(None);
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum LogLevel {
 /// # LogLevel enum
 /// Defines the logger levels parameters: `Console`, `File`, `Both`
