@@ -52,7 +52,7 @@ pub fn set_log_path(config: LogConfig) {
     //! use std::time::Duration;
     //! use std::path::PathBuf;
     //!
-    //! 
+    //! set_log_level(LogLevel::File);
     //! set_log_path(LogConfig::Path(LogPath::from("C:/Users/qruie/Documents")));
     //! ```
     //! 
@@ -61,7 +61,8 @@ pub fn set_log_path(config: LogConfig) {
     //! use logger_rust::*;
     //! use std::time::Duration;
     //! use std::path::PathBuf;
-    //!
+    //! 
+    //! set_log_level(LogLevel::File);
     //! set_log_path(LogConfig::Rotator(LogRotatorConfig::new(
     //!     PathBuf::from("C:/Users/qruie/Documents"),
     //!     5 * 1024 * 1024,

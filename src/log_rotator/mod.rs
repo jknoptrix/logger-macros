@@ -13,6 +13,7 @@
 /// };
 /// 
 /// fn main() {
+///     set_log_level(LogLevel::File);
 ///     set_log_path(LogConfig::Rotator(LogRotatorConfig::new(
 ///         PathBuf::from("C:/Users/JK/Desktop"),
 ///         5 * 1024 * 1024,
@@ -61,6 +62,7 @@ impl LogRotatorConfig {
         //! use std::path::PathBuf;
         //! 
         //! fn main() {
+        //!     set_log_level(LogLevel::File);
         //!     set_log_path(LogConfig::Rotator(LogRotatorConfig::new(
         //!         PathBuf::from("C:/Users/qruie/Documents"), // Logging directory
         //!         5 * 1024 * 1024, // 5MB
@@ -85,6 +87,7 @@ impl From<&str> for LogPath {
 /// use logger_rust::*;
 ///
 /// fn main() {
+///     set_log_level(LogLevel::File);
 ///     set_log_path(LogConfig::Path(LogPath::from("C:/Users/qruie/Documents")));
 ///     // ..
 /// }
@@ -104,6 +107,7 @@ impl From<PathBuf> for LogPath {
 /// use std::path::PathBuf;
 ///
 /// fn main() {
+///     set_log_level(LogLevel::File);
 ///     set_log_path(LogConfig::Path(LogPath::from("C:/Users/qruie/Documents")));
 ///     // ..
 /// }
