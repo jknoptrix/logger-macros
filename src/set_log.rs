@@ -6,13 +6,13 @@ pub use crate::log_rotator::{
     LogRotatorConfig,
 
 };
-
 use std::{
     path::PathBuf,
     process,
     thread,
     time::Duration,
 };
+
 pub fn set_log_level(level: LogLevel) {
 //! Sets the log level to the provided value.
 //!
@@ -33,77 +33,80 @@ pub fn set_log_level(level: LogLevel) {
 }
 
 pub fn set_log_path(config: LogConfig) {
-//! Sets the log path and, optionally, the log rotator configuration.
-//!
-//! This function takes a `LogConfig` argument that specifies the log path and, optionally,
-//! the log rotator configuration. If a log rotator configuration is provided, the log rotator
-//! will automatically rotate the logs when necessary based on the provided configuration.
-//!
-//! # Arguments
-//!
-//! * `config` - The log configuration. Can be either a `LogConfig::Path` variant that specifies
-//!   the log path or a `LogConfig::Rotator` variant that specifies the log path and the log
-//!   rotator configuration.
-//!
-//! # Examples
-//! ### Set the log path without a log rotator:
-//! ```
-//! use logger_rust::*;
-//! use std::time::Duration;
-//! use std::path::PathBuf;
-//!
-//! 
-//! set_log_path(LogConfig::Path(LogPath::from("C:/Users/qruie/Documents")));
-//! ```
-//! 
-//! ### Set the log path with a log rotator
-//! ```
-//! use logger_rust::*;
-//! use std::time::Duration;
-//! use std::path::PathBuf;
-//!
-//! set_log_path(LogConfig::Rotator(LogRotatorConfig::new(
-//!     PathBuf::from("C:/Users/qruie/Documents"),
-//!     5 * 1024 * 1024,
-//!     Duration::from_secs(2),
-//! )));
-//! ```
-    let path = match config {
-        LogConfig::Path(LogPath::Path(path)) => path,
-        LogConfig::Rotator(rotator_config) => {
-            let log_path = rotator_config.log_path.clone();
-            let mut log_rotator_config = LOG_ROTATOR_CONFIG.lock().unwrap();
-            *log_rotator_config = Some(rotator_config);
-            log_path
+    //! Sets the log path and, optionally, the log rotator configuration.
+    //!
+    //! This function takes a `LogConfig` argument that specifies the log path and, optionally,
+    //! the log rotator configuration. If a log rotator configuration is provided, the log rotator
+    //! will automatically rotate the logs when necessary based on the provided configuration.
+    //!
+    //! # Arguments
+    //!
+    //! * `config` - The log configuration. Can be either a `LogConfig::Path` variant that specifies
+    //!   the log path or a `LogConfig::Rotator` variant that specifies the log path and the log
+    //!   rotator configuration.
+    //!
+    //! # Examples
+    //! ### Set the log path without a log rotator:
+    //! ```
+    //! use logger_rust::*;
+    //! use std::time::Duration;
+    //! use std::path::PathBuf;
+    //!
+    //! 
+    //! set_log_path(LogConfig::Path(LogPath::from("C:/Users/qruie/Documents")));
+    //! ```
+    //! 
+    //! ### Set the log path with a log rotator
+    //! ```
+    //! use logger_rust::*;
+    //! use std::time::Duration;
+    //! use std::path::PathBuf;
+    //!
+    //! set_log_path(LogConfig::Rotator(LogRotatorConfig::new(
+    //!     PathBuf::from("C:/Users/qruie/Documents"),
+    //!     5 * 1024 * 1024,
+    //!     Duration::from_secs(2),
+    //! )));
+    //! ```
+    let handle = thread::spawn(move || {
+        let path = match config {
+            LogConfig::Path(LogPath::Path(path)) => path,
+            LogConfig::Rotator(rotator_config) => {
+                let log_path = rotator_config.log_path.clone();
+                let mut log_rotator_config = LOG_ROTATOR_CONFIG.lock().unwrap();
+                *log_rotator_config = Some(rotator_config);
+                log_path
+            }
+        };
+        match (
+            path.exists(),
+            path.is_dir(),
+            path.metadata().map(|m| m.permissions().readonly()),
+        ) {
+            (false, _, _) => {
+                log_error!("Path is not correct: {}", path.display());
+                thread::sleep(Duration::from_secs(10));
+                process::exit(1);
+            }
+            (_, false, _) => {
+                log_error!("Path is not a directory: {}", path.display());
+                thread::sleep(Duration::from_secs(10));
+                process::exit(1);
+            }
+            (_, _, Err(e)) => {
+                log_error!("Failed to get metadata for path {}: {}", path.display(), e);
+                thread::sleep(Duration::from_secs(10));
+                process::exit(1);
+            }
+            (_, _, Ok(false)) => {
+                log_error!("Not enough permissions to access the path: '{}'", path.display());
+                thread::sleep(Duration::from_secs(10));
+                process::exit(1);
+            }
+            _ => {}
         }
-    };
-    match (
-        path.exists(),
-        path.is_dir(),
-        path.metadata().map(|m| m.permissions().readonly()),
-    ) {
-        (false, _, _) => {
-            log_error!("Path is not correct: {}", path.display());
-            thread::sleep(Duration::from_secs(10));
-            process::exit(1);
-        }
-        (_, false, _) => {
-            log_error!("Path is not a directory: {}", path.display());
-            thread::sleep(Duration::from_secs(10));
-            process::exit(1);
-        }
-        (_, _, Err(e)) => {
-            log_error!("Failed to get metadata for path {}: {}", path.display(), e);
-            thread::sleep(Duration::from_secs(10));
-            process::exit(1);
-        }
-        (_, _, Ok(false)) => {
-            log_error!("Not enough permissions to access the path: '{}'", path.display());
-            thread::sleep(Duration::from_secs(10));
-            process::exit(1);
-        }
-        _ => {}
-    }
-    let mut log_path = LOG_PATH.lock().unwrap();
-    *log_path = PathBuf::from(path);
+        let mut log_path = LOG_PATH.lock().unwrap();
+        *log_path = PathBuf::from(path);
+    });
+    handle.join().unwrap();
 }

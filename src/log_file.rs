@@ -12,6 +12,7 @@ use std::{
 
 };
 use chrono::Local;
+
 pub fn log_to_file(now: &str, message: &str) -> io::Result<()> {
 //! # log_to_file
 //! The `log_to_file` function takes two arguments: `now` and `message`. 

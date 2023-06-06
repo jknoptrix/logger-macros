@@ -1,6 +1,6 @@
 [package]
 name = "logger-rust"
-version = "0.1.40"
+version = "0.1.41"
 edition = "2021"
 authors = ["Albert Munchhausen", "jknoptrix <support@classicpvp.ru>"]
 description = "A crate for logger with 4 loggin types and 3 types of level logging"
@@ -13,6 +13,8 @@ categories = ["development-tools::debugging"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-trait = "0.1.68"
 chrono = "0.4.26"
 lazy_static = "1.4.0"
 once_cell = "1.18.0"
+tokio = "1.28.2"
