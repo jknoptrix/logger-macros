@@ -94,7 +94,6 @@ pub use crate::log_file::log_message;
 pub use crate::set_log::{set_log_level, set_log_path};
 pub use crate::config::{LogVariables, LogVariablesImpl, LogLevel};
 
-pub use sys_info::*;
 pub fn error(now: &str, message: &str) {
 //! # Error
 //! Outputs an error message via `log_error!` macros.
