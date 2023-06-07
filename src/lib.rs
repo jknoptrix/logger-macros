@@ -13,7 +13,7 @@
 //!
 //! ```env
 //! [dependencies]
-//! logger-rust = "0.1.45"
+//! logger-rust = "0.2.0"
 //! ```
 //! Then, import the crate:
 //! ```rust
@@ -93,6 +93,8 @@ pub use crate::time::current_time;
 pub use crate::log_file::log_message;
 pub use crate::set_log::{set_log_level, set_log_path};
 pub use crate::config::{LogVariables, LogVariablesImpl, LogLevel};
+
+pub use sys_info::*;
 pub fn error(now: &str, message: &str) {
 //! # Error
 //! Outputs an error message via `log_error!` macros.
@@ -145,6 +147,24 @@ pub fn debug(now: &str, message: &str) {
     log_message("DEBUG", now, message);
 }
 
+pub fn trace(now: &str, message: &str) {
+    //! # Debug
+    //! Outputs an debug message via `log_debug` macros.
+    //! You can also use just an `debug` method instead, but it requires you to define any variable as `&str`
+    //! > E.g:
+    //! ```rust
+    //! use logger_rust::debug;
+    //! use logger_rust::current_time;
+    //! debug(&current_time(), "A debug message");
+    //! ```
+        log_message("TRACE", now, message);
+    }
+    
+
+trait Loggable {
+    fn log_behavior(&self) -> String;
+}
+
 #[macro_export]
 /// ## Macro rules - log_error!
 /// The log_error macro takes any number of arguments and formats them using the format! macro. 
@@ -186,5 +206,42 @@ macro_rules! log_debug {
     ($($arg:tt)*) => {{
         let now = $crate::current_time();
         $crate::debug(&now, &format!($($arg)*));
+    }}
+}
+
+#[macro_export]
+macro_rules! log_trace {
+    ($debug_object:expr) => {{
+        log_trace!($debug_object, "");
+    }};
+    ($debug_object:expr, $context:expr) => {{
+        let now = $crate::current_time();
+        let line = line!();
+        let file = file!();
+        let thread_id = std::thread::current().id();
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_micros();
+        let context_str = if $context.is_empty() {
+            String::new()
+        } else {
+            format!(" ->> Context: {}", $context)
+        };
+        let debug_info = format!(
+            "\x1b[34m{}:{} - used: \x1b[32m{}\x1b[36m ->> ({:?}): \x1b[31m{:?}->> Thread ID: {:?} Timestamp: {}{}\x1b[0m ",
+            file, line, 
+            stringify!($debug_object), 
+            &$debug_object, 
+            $debug_object,
+            thread_id,
+            timestamp,
+            context_str
+        );
+        $crate::log_message("TRACE", &now, &debug_info);
+    }};
+    ($($arg:tt)*) => {{
+        let now = $crate::current_time();
+        $crate::log_message("TRACE", &now, &format!($($arg)*));
     }}
 }

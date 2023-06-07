@@ -70,6 +70,7 @@ pub fn log_message(level: &str, now: &str, message: &str) {
         "WARN" => "\x1b[33m",  // yellow
         "INFO" => "\x1b[36m",  // cyan
         "DEBUG" => "\x1b[34m", // blue
+        "TRACE" => "\x1b[35m", // idk
         _ => "\x1b[0m",        // reset
     };
     let message = format!(
