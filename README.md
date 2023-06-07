@@ -13,7 +13,7 @@ To use this crate in your project, add it as a dependency in your `Cargo.toml` f
 
 ```env
 [dependencies]
-logger-rust = "0.2.0"
+logger-rust = "0.2.01"
 ```
 Then, import the crate:
 ```rust
@@ -30,7 +30,7 @@ fn main() {
 ```
 By default, log messages are printed to the console. You can use the `set_log_level` function to specify where log messages should be written:
 ```rust
-use log_crate::{set_log_level, LogLevel};
+use logger_rust::*;
 
 fn main() {
     set_log_level(LogLevel::Both);
@@ -85,9 +85,7 @@ fn main() {
 # Examples
 Here’s an example that shows how to use this crate in a Rust project:
 ```rust
-#[macro_use]
-extern crate logger_rust;
-use log_crate::{set_log_level, LogLevel};
+use logger_rust::*;
 
 fn main() {
     set_log_level(LogLevel::Both);
@@ -100,8 +98,6 @@ fn main() {
 ```
 Also if you want, you can add `set_log_path(LogConfig::Path(LogPath::From("string")` method:
 ```rust
-extern crate logger_rust;
-use log_crate::{set_log_level, LogLevel};
 use logger_rust::*;
 
 fn main() {
@@ -133,9 +129,9 @@ A debug message: Something happened in detail
 
 # Custom logging
 After 0.1.2 version, you can create a custom logging function with macros.
-1. Create a `class` named as function that you needed (e.g. `trace`):
+1. Create a `class` named as function that you needed (e.g. `custom`):
 ```rust
-pub fn trace(now: &str, message: &str) {
+pub fn custom(now: &str, message: &str) {
     log_message("TRACE", now, message);
 }
 ```
@@ -143,7 +139,7 @@ Note that log_message functions requires 3 arguments: `now`, `message`, but you 
 2. Create a macros for method which you created:
 ```rust
 #[macro_export]
-macro_rules! log_trace {
+macro_rules! log_custom {
     ($($arg:tt)*) => {{
         let now = $crate::current_time(); // create a timestamp
         $crate::trace(&now, &format!($($arg)*)); // output the timestamp with message
@@ -155,12 +151,12 @@ Note that `arg` requires 2 arguments.
 ```rust
 fn main() {
     set_log_level(LogLevel::Both);
-    log_trace!("A trace log macros");
+    log_custom!("A custom log macros");
 }
 ```
-Since you have `fn trace`, you can also use this:
+Since you have `fn custom`, you can also use this:
 ```rust
-    trace(&current_time(), "A trace log");
+    custom(&current_time(), "A custom log");
 ```
 It does the same, but you can provide a value instead of `&current_time()`. But it requires 2 arguments:
 1. An `&str` *`now` in our contex*

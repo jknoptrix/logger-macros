@@ -13,7 +13,7 @@
 //!
 //! ```env
 //! [dependencies]
-//! logger-rust = "0.2.0"
+//! logger-rust = "0.2.01"
 //! ```
 //! Then, import the crate:
 //! ```rust
@@ -209,6 +209,7 @@ macro_rules! log_debug {
 }
 
 #[macro_export]
+/// ## Macro rules - log_trace!
 macro_rules! log_trace {
     ($debug_object:expr) => {{
         log_trace!($debug_object, "");
