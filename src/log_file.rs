@@ -66,7 +66,7 @@ pub fn log_message(level: &str, now: &str, message: &str) {
 //! - The `function` matches the log level with a color code and formats the message with the color code and log level. 
 //! It then checks the current log level and logs the message to either the console, a file, or both depending on the current log level.
     let color_code = match level {
-        "ERROR" => "\x1b[31m", // red
+        "ERROR" => "\x1b[31m\x1b[1m", // red
         "WARN" => "\x1b[33m",  // yellow
         "INFO" => "\x1b[36m",  // cyan
         "DEBUG" => "\x1b[34m", // blue

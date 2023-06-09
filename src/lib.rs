@@ -13,7 +13,7 @@
 //!
 //! ```env
 //! [dependencies]
-//! logger-rust = "0.2.10"
+//! logger-rust = "0.2.12"
 //! ```
 //! Then, import the crate:
 //! ```rust
@@ -81,13 +81,16 @@
 //!
 //! 
 //!
+
 pub mod time;
 pub mod config;
 pub mod set_log;
 pub mod log_file;
 pub mod log_rotator;
+pub mod tracer_config;
 pub use crate::set_log::*;
 pub use crate::log_rotator::*;
+pub use crate::tracer_config::*;
 pub use crate::config::LOG_PATH;
 pub use crate::time::current_time;
 pub use crate::log_file::log_message;
@@ -147,22 +150,18 @@ pub fn debug(now: &str, message: &str) {
 }
 
 pub fn trace(now: &str, message: &str) {
-    //! # Debug
-    //! Outputs an debug message via `log_debug` macros.
-    //! You can also use just an `debug` method instead, but it requires you to define any variable as `&str`
-    //! > E.g:
-    //! ```rust
-    //! use logger_rust::debug;
-    //! use logger_rust::current_time;
-    //! debug(&current_time(), "A debug message");
-    //! ```
-        log_message("TRACE", now, message);
-    }
-    
-
-trait Loggable {
-    fn log_behavior(&self) -> String;
+//! # Debug
+//! Outputs an debug message via `log_debug` macros.
+//! You can also use just an `debug` method instead, but it requires you to define any variable as `&str`
+//! > E.g:
+//! ```rust
+//! use logger_rust::debug;
+//! use logger_rust::current_time;
+//! debug(&current_time(), "A debug message");
+//! ```
+    log_message("TRACE", now, message);
 }
+    
 
 #[macro_export]
 /// ## Macro rules - log_error!
@@ -209,7 +208,30 @@ macro_rules! log_debug {
 }
 
 #[macro_export]
-/// ## Macro rules - log_trace!
+/// `log_trace!` is a macro that logs trace-level messages.
+///
+/// ## Usage
+///
+/// The `log_trace!` macro can be used in three different ways:
+///
+/// 1. `log_trace!(debug_object)`: This logs the debug representation of the `debug_object` along with its type name and location information (file, line, column, module path).
+///
+/// 2. `log_trace!(debug_object, context)`: This logs the same information as the first form, but also includes a context string that can provide additional information about the log message.
+///
+/// 3. `log_trace!(format_string, args...)`: This logs a formatted message using the given format string and arguments. The format string should follow the same syntax as the standard `format!` macro.
+///
+/// ## Examples
+///
+/// ```rust
+/// use logger_rust::*;
+/// let x: i32 = 42;
+/// log_trace!(x); // Logs: "TRACE 2023-06-09 14:57:47 [TRACE] src\<module>:L29/C1 - used: x ->> (42): 42 | Type: <i32> | ThreadId(4) ->> Timestamp: UN1686304667694020IX | Module <module>"
+///
+/// let y = "Hello, world!";
+/// log_trace!(y, "greeting"); // Logs: "2023-06-09 14:57:47 [TRACE] src\<module>:L32/C1 - used: y ->> ("Hello, world!"): "Hello, world!" | Type: <&str> | ThreadId(4) ->> Timestamp: UN1686304667694335IX ->> Context: <greeting> | Module: <module>"
+///
+/// log_trace!(x, "{}"); // Logs: "TRACE used: x ->> (42): 42 | Type: <i32> ... <context is empty>"
+/// ```
 macro_rules! log_trace {
     ($debug_object:expr) => {{
         log_trace!($debug_object, "");
@@ -218,6 +240,7 @@ macro_rules! log_trace {
         let now = $crate::current_time();
         let line = line!();
         let file = file!();
+        let module_path = module_path!();
         let thread_id = std::thread::current().id();
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -226,17 +249,22 @@ macro_rules! log_trace {
         let context_str = if $context.is_empty() {
             String::new()
         } else {
-            format!(" ->> Context: {}", $context)
+            format!("\x1b[36m ->> Context: \x1b[0m\x1b[1m<{}>", $context)
         };
+        let type_name = $debug_object.type_name();
+        let column = column!();
         let debug_info = format!(
-            "\x1b[34m{}:{} - used: \x1b[32m{}\x1b[36m ->> ({:?}): \x1b[31m{:?}->> Thread ID: {:?} Timestamp: {}{}\x1b[0m ",
-            file, line, 
+            "\x1b[34m{}:L{}/C{} - used: \x1b[32m{}\x1b[36m ->> ({:?}): \x1b[31m{:?}\x1b[36m | \x1b[32mType: \x1b[0m\x1B[1m<{}>\x1b[0m | \x1b[32m{:?} \x1b[36m->> \x1b[34mTimestamp: UN{}IX{}\x1b[0m\x1b[36m |\x1b[33m Module: \x1b[0m{}",
+            file, line,
+            column,
             stringify!($debug_object), 
             &$debug_object, 
             $debug_object,
+            type_name,
             thread_id,
             timestamp,
-            context_str
+            context_str,
+            module_path,
         );
         $crate::log_message("TRACE", &now, &debug_info);
     }};

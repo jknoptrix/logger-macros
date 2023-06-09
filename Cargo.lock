@@ -114,11 +114,13 @@ checksum = "518ef76f2f87365916b142844c16d8fefd85039bc5699050210a7778ee1cd1de"
 
 [[package]]
 name = "logger-rust"
-version = "0.2.10"
+version = "0.2.12"
 dependencies = [
  "chrono",
  "lazy_static",
  "once_cell",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -156,9 +158,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.18"
+version = "2.0.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32d41677bcbe24c20c52e7c70b0d8db04134c5d1066bf98662e2871ad200ea3e"
+checksum = "a10b47e4921acc65b7d824cd92bc7b67a26382d8f4eadf3da65cb50aee6e6f3f"
 dependencies = [
  "proc-macro2",
  "quote",

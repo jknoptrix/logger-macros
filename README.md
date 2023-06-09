@@ -13,13 +13,13 @@ To use this crate in your project, add it as a dependency in your `Cargo.toml` f
 
 ```env
 [dependencies]
-logger-rust = "0.2.10"
+logger-rust = "0.2.13"
 ```
 Then, import the crate:
 ```rust
 use logger_rust::*;
 ```
-You can now use the `log_error!`, `log_warn!`, `log_info!`, and `log_debug!` macros to log messages of different types:
+You can now use the `log_error!`, `log_warn!`, `log_info!`, `log_debug` and `log_trace!` macros to log messages of different types:
 ```rust
 fn main() {
     log_error!("An error occurred: {}", "Something went wrong");
@@ -27,6 +27,33 @@ fn main() {
     log_info!("An info message: {}", "Something happened");
     log_debug!("A debug message: {}", "Something happened in detail");
 }
+```
+log_trace! example:
+```rust
+
+#[derive(Debug)]
+struct Person {
+    name: String,
+    age: u8,
+}
+
+fn main() {
+    let my_struct = MyStruct;
+    my_struct.do_something();
+    log_trace!(my_struct.do_something());
+    
+    let x = 5;
+    log_trace!(x);
+
+    let person = Person { name: "Alice".to_string(), age: 20 };
+    log_trace!(person, person.name);
+}
+```
+Output:
+```
+2023-06-09 15:06:46 [TRACE] src\main.rs:L23/C5 - used: my_struct.do_something() ->> (()): () | Type: <()> | ThreadId(1) ->> Timestamp: UN1686305206652692IX | Module: debug
+2023-06-09 15:06:46 [TRACE] src\main.rs:L26/C5 - used: x ->> (5): 5 | Type: <i32> | ThreadId(1) ->> Timestamp: UN1686305206653039IX | Module: debug
+2023-06-09 15:06:46 [TRACE] src\main.rs:L29/C5 - used: person ->> (Person { name: "Alice", age: 20 }): Person { name: "Alice", age: 20 } | Type: <debug::Person> | ThreadId(1) ->> Timestamp: UN1686305206653281IX ->> Context: <Alice> | Module: debug
 ```
 By default, log messages are printed to the console. You can use the `set_log_level` function to specify where log messages should be written:
 ```rust
